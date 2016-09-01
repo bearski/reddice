@@ -7,6 +7,7 @@ import User from '../models/user';
 
 let router = express.Router();
 
+
 function validateInput(data, otherValidations) {
   let { errors } = otherValidations(data);
 
@@ -30,6 +31,18 @@ function validateInput(data, otherValidations) {
   })
 }
 
+
+router.get('/:identifier', (req, res) => {
+  User.query({
+    select: [ 'username', 'email' ],
+    where: { email: req.params.identifier },
+    orWhere: { username: req.params.identifier }
+  }).fetch().then(user => {
+    res.json({ user });
+  });
+});
+
+
 router.post('/', (req, res) => {
   validateInput(req.body, commonValidations).then(({ errors, isValid }) => {
     if (isValid) {
@@ -47,5 +60,6 @@ router.post('/', (req, res) => {
     }
   });
 });
+
 
 export default router;
